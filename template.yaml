@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: Auth API
+
+Resources:
+  Test:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: src/test.handler
+      CodeUri: .
+      Architectures:
+        - x86_64
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /test
+            Method: GET   
+
+  AccountsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AccountsTable
+      AttributeDefinitions:
+        - AttributeName: username
+          AttributeType: S
+        - AttributeName: password
+          AttributeType: S
+      KeySchema:
+        - AttributeName: username
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SessionsTable
+      AttributeDefinitions:
+        - AttributeName: sessionID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: sessionID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST

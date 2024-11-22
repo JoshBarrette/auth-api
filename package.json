@@ -1,0 +1,25 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start-docker-network": "docker network create sam",
+    "new-dynamo": "./scripts/newDynamo.sh",
+    "api": "sam local start-api --docker-network sam"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.696.0",
+    "@aws-sdk/lib-dynamodb": "^3.698.0",
+    "@types/aws-lambda": "^8.10.145",
+    "aws-lambda": "^1.0.7",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  },
+  "type": "module"
+}
