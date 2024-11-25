@@ -1,5 +1,4 @@
 import AWSLambda from "aws-lambda";
-import bcryptjs from "bcryptjs";
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 
@@ -13,16 +12,25 @@ const dynamo = DynamoDBDocument.from(
  * @returns {AWSLambda.APIGatewayProxyResult}
  */
 export const handler = async (event, context) => {
-  const h = bcryptjs.hashSync("test", 2);
   console.log("hash", h);
   console.log(
     await dynamo
       .put({
-        TableName: "AccountsTable",
-        Item: { username: "a", password: "b" },
+        TableName: process.env.ACCOUNTS_TABLE,
+        Item: { username: "name", password: "pass" },
       })
       .catch((e) => console.log(e))
   );
+
+  // await dynamo
+  //   .put({
+  //     TableName: process.env.SESSIONS_TABLE,
+  //     Item: {
+  //       sessionID: "live for 10 seconds",
+  //       ttl: Math.floor(Date.now() / 1000) + 10,
+  //     },
+  //   })
+  //   .catch((e) => console.log(e));
 
   try {
     return {

@@ -3,21 +3,76 @@ Transform: AWS::Serverless-2016-10-31
 
 Description: Auth API
 
+Globals:
+  Function:
+    Environment:
+      Variables:
+        ACCOUNTS_TABLE: !Ref AccountsTable
+        SESSIONS_TABLE: !Ref SessionsTable
+
 Resources:
+  AuthApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionArn: !GetAtt MyAuthFunction.Arn
+
   Test:
     Type: AWS::Serverless::Function
     Properties:
       Runtime: nodejs20.x
       Handler: src/test.handler
       CodeUri: .
-      Architectures:
-        - x86_64
       Events:
-        Api:
+        RunTest:
           Type: Api
           Properties:
             Path: /test
-            Method: GET   
+            Method: GET
+            RestApiId: !Ref AuthApi
+
+  CreateAccount:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: src/createAccount.handler
+      CodeUri: .
+      Events:
+        RunTest:
+          Type: Api
+          Properties:
+            Path: /createAccount
+            Method: POST
+            RestApiId: !Ref AuthApi
+            Auth:
+              Authorizer: NONE
+
+  Login:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs20.x
+      Handler: src/login.handler
+      CodeUri: .
+      Events:
+        RunTest:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: GET
+            RestApiId: !Ref AuthApi
+            Auth:
+              Authorizer: NONE  
+  
+  MyAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/authorizer.handler
+      Runtime: nodejs20.x
 
   AccountsTable:
     Type: AWS::DynamoDB::Table
@@ -40,7 +95,14 @@ Resources:
       AttributeDefinitions:
         - AttributeName: sessionID
           AttributeType: S
+        - AttributeName: username
+          AttributeType: S
+        - AttributeName: ttl
+          AttributeType: N
       KeySchema:
         - AttributeName: sessionID
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true

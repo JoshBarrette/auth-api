@@ -20,3 +20,8 @@ aws dynamodb create-table \
     --key-schema AttributeName=sessionID,KeyType=HASH \
     --billing-mode PAY_PER_REQUEST \
     --endpoint-url http://localhost:8000
+
+aws dynamodb update-time-to-live \
+    --table-name SessionsTable \
+    --time-to-live-specification "Enabled=true, AttributeName=ttl" \
+    --endpoint-url http://localhost:8000
