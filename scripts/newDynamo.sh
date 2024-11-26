@@ -1,3 +1,6 @@
+#!/bin/bash
+
+# Need to have sam network up before executing
 docker run \
     --name dynamodb-local \
     -d \

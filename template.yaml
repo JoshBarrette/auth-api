@@ -21,19 +21,21 @@ Resources:
           MyLambdaRequestAuthorizer:
             FunctionArn: !GetAtt MyAuthFunction.Arn
 
-  Test:
+  IsSignedIn:
     Type: AWS::Serverless::Function
     Properties:
       Runtime: nodejs20.x
-      Handler: src/test.handler
+      Handler: src/isSignedIn.handler
       CodeUri: .
       Events:
         RunTest:
           Type: Api
           Properties:
-            Path: /test
+            Path: /isSignedIn
             Method: GET
             RestApiId: !Ref AuthApi
+            Auth:
+              Authorizer: NONE
 
   CreateAccount:
     Type: AWS::Serverless::Function

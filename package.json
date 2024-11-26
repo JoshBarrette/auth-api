@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start-docker-network": "docker network create sam",
-    "new-dynamo": "./scripts/newDynamo.sh",
-    "api": "sam local start-api --docker-network sam"
+    "start-dynamo": "./scripts/newDynamo.sh",
+    "start-api": "sam local start-api --docker-network sam"
   },
   "keywords": [],
   "author": "",

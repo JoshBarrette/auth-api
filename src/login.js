@@ -1,12 +1,8 @@
 import AWSLambda from "aws-lambda";
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import * as Shared from "./shared.mjs";
 import * as uuid from "uuid";
 
-const dynamo = DynamoDBDocument.from(
-  new DynamoDB({ endpoint: "http://dynamodb-local:8000" })
-);
+const dynamo = Shared.newDynamo();
 
 /**
  * @param {AWSLambda.APIGatewayProxyEvent} event

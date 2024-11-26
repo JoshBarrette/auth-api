@@ -1,13 +1,28 @@
 import * as argon2 from "argon2";
+import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
+
+/**
+ * @returns {DynamoDBDocument}
+ */
+export function newDynamo() {
+  return DynamoDBDocument.from(
+    new DynamoDB({
+      endpoint: process.env.AWS_SAM_LOCAL
+        ? "http://dynamodb-local:8000"
+        : undefined,
+    })
+  );
+}
 
 /**
  * Hash a password
  * @param {string} password Password to hash
  * @returns {Promise<string>} The hashed password
  */
-export const hash = async (password) => {
+export async function hash(password) {
   return await argon2.hash(password);
-};
+}
 
 /**
  * Verify a hashed password
@@ -15,9 +30,9 @@ export const hash = async (password) => {
  * @param {string} password Plaintext password
  * @returns {Promise<boolean>} If they match
  */
-export const verifyPassword = async (hash, password) => {
+export async function verifyPassword(hash, password) {
   return await argon2.verify(hash, password);
-};
+}
 
 /**
  * Check that the username and password are defined
@@ -25,7 +40,7 @@ export const verifyPassword = async (hash, password) => {
  * @param {string | undefined} password
  * @returns Null if they do, error responses if they do not
  */
-export const checkCredentials = (username, password) => {
+export function checkCredentials(username, password) {
   if (!username && !password) {
     return {
       statusCode: 400,
@@ -50,4 +65,4 @@ export const checkCredentials = (username, password) => {
   }
 
   return null;
-};
+}

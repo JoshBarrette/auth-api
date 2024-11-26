@@ -1,10 +1,7 @@
 import AWSLambda from "aws-lambda";
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
+import * as Shared from "./shared.mjs";
 
-const dynamo = DynamoDBDocument.from(
-  new DynamoDB({ endpoint: "http://dynamodb-local:8000" })
-);
+const dynamo = Shared.newDynamo();
 
 /**
  * @param {AWSLambda.APIGatewayAuthorizerEvent} event
@@ -17,8 +14,8 @@ export const handler = async (event, context, callback) => {
    * @type {string}
    */
   const token = event.authorizationToken;
-  if (!token || !token.split(" ")[1]) {
-    callback("No Token");
+  if (!token || !token.split(" ")[1] || !token.includes("Bearer ")) {
+    callback(null, generateDeny("Lambda Allow Policy", event.methodArn));
     return;
   }
 
@@ -32,10 +29,11 @@ export const handler = async (event, context, callback) => {
   if (session.Item) {
     callback(null, generateAllow("Lambda Allow Policy", event.methodArn));
   } else {
-    callback("Unauthorized");
+    callback(null, generateDeny("Lambda Allow Policy", event.methodArn));
   }
 };
 
+// Thank you AWS docs
 const generatePolicy = function (principalId, effect, resource) {
   var authResponse = {};
   authResponse.principalId = principalId;
@@ -50,7 +48,6 @@ const generatePolicy = function (principalId, effect, resource) {
     policyDocument.Statement[0] = statementOne;
     authResponse.policyDocument = policyDocument;
   }
-
   return authResponse;
 };
 
@@ -58,6 +55,6 @@ const generateAllow = function (principalId, resource) {
   return generatePolicy(principalId, "Allow", resource);
 };
 
-// const generateDeny = function (principalId, resource) {
-//   return generatePolicy(principalId, "Deny", resource);
-// };
+const generateDeny = function (principalId, resource) {
+  return generatePolicy(principalId, "Deny", resource);
+};
